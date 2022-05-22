@@ -17,8 +17,23 @@ using std::vector;
 // TODO: Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
 
-// TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
+vector<Process>& System::Processes() {
+    //declare empty vector of process objects
+    vector<Process> processVector{};
+    //fetch a vector of the current active pricess ids
+    vector<int> processIds = LinuxParser::Pids();
+    //for each process id construct a process object and push it into the process vector
+    for (auto i : processIds) {
+        Process temp(i);
+        processVector.push_back(temp);
+    }
+//TODO:sort process objects by their CPU utilization
+
+
+//update the private member variable and return it 
+processes_ = processVector;
+return processes_;
+}
 
 // TODO: Return the system's kernel identifier (string)
 std::string System::Kernel() { return LinuxParser::Kernel(); }

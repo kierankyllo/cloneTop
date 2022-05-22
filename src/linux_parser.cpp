@@ -104,7 +104,6 @@ return 0;
 
 
 long LinuxParser::Jiffies() { 
-
 vector<long> cpuCurrValues = LinuxParser::CpuUtilization();
   long currJiff {0};
   //sum the first 7 values of the vector into total current sum 
@@ -118,7 +117,7 @@ return currJiff;
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
 
-// TODO: Read and return the number of active jiffies for the system
+
 long LinuxParser::ActiveJiffies() { 
 vector<long> cpuCurrValues = CpuUtilization();
   long currActive {0};
@@ -129,7 +128,7 @@ vector<long> cpuCurrValues = CpuUtilization();
 return currActive;  
 }
 
-// TODO: Read and return the number of idle jiffies for the system
+
 long LinuxParser::IdleJiffies() { 
 vector<long> cpuCurrValues = LinuxParser::CpuUtilization();
   long currIdle {0};
@@ -196,13 +195,40 @@ int LinuxParser::RunningProcesses() {
 return 0;
 }
 
-// TODO: Read and return the command associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid[[maybe_unused]]) { return string(); }
 
-// TODO: Read and return the memory used by a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Ram(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::Command(int pid) { 
+  string cmdLineString;
+  std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kCmdlineFilename);
+  if (stream.is_open()) {
+    std::getline(stream, cmdLineString);
+  return cmdLineString;
+  }
+return "~";
+}
+
+
+string LinuxParser::Ram(int pid) { 
+  string line, key, value, ignore;
+  //define the search term
+  key = "VmSize:";
+  //open input file stream and if it opens well formed, stream it into a linestream line by line while there are lines
+  std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kStatusFilename);
+  long vmSize;
+  if (stream.is_open()) {
+    while (std::getline(stream, line)){
+      std::istringstream iss(line);
+      //if the linestream contains the search term return the second token on that line
+      if (line.find(key, 0) != string::npos){
+        iss >> ignore >> value;
+        vmSize = stol(value);
+        break;
+      }
+    }
+
+  return to_string(vmSize /1024);
+  }
+return "~";
+}
 
 // TODO: Read and return the user ID associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
