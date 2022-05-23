@@ -208,12 +208,12 @@ return "~";
 
 
 string LinuxParser::Ram(int pid) { 
-  string line, key, value, ignore;
+  string line, key, value, ignore = "";
   //define the search term
   key = "VmSize:";
   //open input file stream and if it opens well formed, stream it into a linestream line by line while there are lines
   std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kStatusFilename);
-  long vmSize;
+  unsigned long vmSize = 0;
   if (stream.is_open()) {
     while (std::getline(stream, line)){
       std::istringstream iss(line);
@@ -224,19 +224,53 @@ string LinuxParser::Ram(int pid) {
         break;
       }
     }
-
   return to_string(vmSize /1024);
   }
 return "~";
 }
 
-// TODO: Read and return the user ID associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Uid(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::Uid(int pid) {
+  
+  string line, key, value, ignore = "";
+  //define the search term
+  key = "Uid:";
+  //open input file stream and if it opens well formed, stream it into a linestream line by line while there are lines
+  std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kStatusFilename);
+  string uidString;
+  if (stream.is_open()) {
+    while (std::getline(stream, line)){
+      std::istringstream iss(line);
+      //if the linestream contains the search term return the second token on that line
+      if (line.find(key, 0) != string::npos){
+        iss >> ignore >> value;
+        uidString = value;
+        break;
+      }
+    }
+  return uidString;
+  }
+return "~";
+}
 
-// TODO: Read and return the user associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::User(int pid[[maybe_unused]]) { return string(); }
+
+string LinuxParser::User(int pid) {
+
+  string uid = Uid(pid);
+  string line, key, userString, ignore;
+  std::ifstream filestream(kPasswordPath);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::replace(line.begin(), line.end(), ':', ' ');
+      std::istringstream linestream(line);
+      while (linestream >> userString >> ignore >> key) {
+        if (key == uid) {
+          return userString;
+        }
+      }
+    }
+  }
+  return userString;
+}
 
 // TODO: Read and return the uptime of a process
 long LinuxParser::UpTime(int pid[[maybe_unused]]) { return 0; }

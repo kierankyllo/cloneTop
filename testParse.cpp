@@ -139,15 +139,60 @@ void printVector(vector<long> v){
   }
 }
 
+string Uid(int pid) {
+  
+  string line, key, value, ignore = "";
+  //define the search term
+  key = "Uid:";
+  //open input file stream and if it opens well formed, stream it into a linestream line by line while there are lines
+  std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kStatusFilename);
+  string uidString;
+  if (stream.is_open()) {
+    while (std::getline(stream, line)){
+      std::istringstream iss(line);
+      //if the linestream contains the search term return the second token on that line
+      if (line.find(key, 0) != string::npos){
+        iss >> ignore >> value;
+        uidString = value;
+        break;
+      }
+    }
+  return uidString;
+  }
+return "~";
+}
+
+
+string User(int pid) {
+
+  string uid = Uid(pid);
+  string line, key, userString, ignore;
+  std::ifstream filestream(kPasswordPath);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::replace(line.begin(), line.end(), ':', ' ');
+      std::istringstream linestream(line);
+      while (linestream >> userString >> ignore >> key) {
+        if (key == uid) {
+          return userString;
+        }
+      }
+    }
+  }
+  return userString;
+}
+
 
 int main(){
-    
+
+ std::cout << User(1); 
+
   //printVector(CpuUtilization());
-  double total = ActiveJiffies();
-  double idle = IdleJiffies();
-  double util = (total - idle)/total;
-  std::cout << total << "\n";
-  std::cout << idle << "\n";
-  std::cout << util << "\n";
+  // double total = ActiveJiffies();
+  // double idle = IdleJiffies();
+  // double util = (total - idle)/total;
+  // std::cout << total << "\n";
+  // std::cout << idle << "\n";
+  // std::cout << util << "\n";
 return 0;
 }
