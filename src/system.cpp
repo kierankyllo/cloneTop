@@ -28,7 +28,7 @@ vector<Process>& System::Processes() {
         processVector.push_back(temp);
     }
 //TODO:sort process objects by their CPU utilization
-
+    std::sort( processVector.begin(), processVector.end());
 
 //update the private member variable and return it 
 processes_ = processVector;

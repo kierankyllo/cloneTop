@@ -3,6 +3,15 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include <dirent.h>
+#include <unistd.h>
+#include <string>
+#include <vector>
+
+using std::stof;
+using std::string;
+using std::to_string;
+using std::vector;
 
 using namespace std;
 
@@ -133,14 +142,14 @@ vector<long> cpuCurrValues = CpuUtilization();
 return currIdle; 
 }
 
-void printVector(vector<long> v){
+void printVector(vector<string> v){
   for (auto i : v){
     cout << i << " ";
   }
 }
 
 string Uid(int pid) {
-  
+
   string line, key, value, ignore = "";
   //define the search term
   key = "Uid:";
@@ -182,11 +191,70 @@ string User(int pid) {
   return userString;
 }
 
+vector<string> procUtilization(int pid) { 
+  vector<string> processUtil;
+  string line, ignore, figures;
+  std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kStatFilename);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+
+    for (auto i = 0; i< 22; i++){
+      linestream >> figures;
+      processUtil.push_back(figures);
+    }
+
+  }
+return processUtil;  
+}
+
+long UpTime(int pid) {
+  string line;
+  long uptime = 0;
+  string value;
+  std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kStatFilename);
+  if (stream.is_open()) {
+    while (std::getline(stream, line)) {
+      std::istringstream iss(line);
+      for (int i = 1; i <= 22; i++) {
+        iss >> value;
+        if (i == 22) {
+          // read the starttime value in clock ticks and convert to seconds
+          // devide by clock ticks per second
+          try {
+            uptime = std::stol(value) / sysconf(_SC_CLK_TCK);
+            return uptime;
+          } catch (const std::invalid_argument& arg) {
+            return 0;
+          }
+        }
+      }
+    }
+  }
+  return uptime;
+}
+
+vector<string> getProcUtilVector(int pid){
+
+  vector<string> procValues;
+  string line, value;
+  std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kStatFilename);
+  if (stream.is_open()) {
+    while (std::getline(stream, line)) {
+      std::istringstream iss(line);
+      for (int i = 0; i <= 22; i++) {
+        iss >> value;
+        procValues.push_back(value);
+      }
+    }
+  }
+return procValues;
+}
 
 int main(){
-
- std::cout << User(1); 
-
+  //std::cout << UpTime(11118);
+  //std::cout << User(1); 
+  printVector(getUtilVector(11337));
   //printVector(CpuUtilization());
   // double total = ActiveJiffies();
   // double idle = IdleJiffies();
