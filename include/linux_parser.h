@@ -41,6 +41,7 @@ enum CPUStates {
   kGuestNice_
 };
 
+// Process vector data locations
 enum ProcessCPUStates {
   kUtime_ = 14,
   kStime_ = 15,
@@ -49,6 +50,7 @@ enum ProcessCPUStates {
   kStarttime_ = 22
 };
 
+// CPU
 std::vector<long> CpuUtilization();
 long Jiffies();
 long ActiveJiffies();

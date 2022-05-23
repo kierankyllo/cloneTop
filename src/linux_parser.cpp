@@ -10,8 +10,6 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-//TODO: document all functions and their internals
-//TODO: refactor all integer refs to enum ProcessCPUStates
 
 string LinuxParser::OperatingSystem() {
 

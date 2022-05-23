@@ -4,6 +4,7 @@
 
 using std::string;
 
+
 string Format::PrettyDate(long data){
 
     string tempFig = std::to_string(data);
@@ -13,6 +14,7 @@ string Format::PrettyDate(long data){
     }
 return tempFig;
 }
+
 
 string Format::ElapsedTime(long seconds) { 
     long hh, mm, ss, dd;

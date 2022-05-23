@@ -28,6 +28,7 @@ std::string NCursesDisplay::ProgressBar(float percent) {
   return result + " " + display + "/100%";
 }
 
+
 void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   int row{0};
   mvwprintw(window, ++row, 2, ("OS: " + system.OperatingSystem()).c_str());
@@ -51,6 +52,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
             ("Up Time: " + Format::ElapsedTime(system.UpTime())).c_str());
   wrefresh(window);
 }
+
 
 void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
                                       WINDOW* window, int n) {
@@ -82,6 +84,7 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
               processes[i].Command().substr(0, window->_maxx - 46).c_str());
   }
 }
+
 
 void NCursesDisplay::Display(System& system, int n) {
   initscr();      // start ncurses
