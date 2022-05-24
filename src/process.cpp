@@ -12,7 +12,7 @@ using std::to_string;
 using std::vector;
 
 //Defines a constructor for Process
-Process::Process(int pid) : pid_(pid){
+Process::Process(const int& pid) : pid_(pid){
 
     user_  = LinuxParser::User(pid);
     command_ = LinuxParser::Command(pid);

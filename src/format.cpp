@@ -6,7 +6,7 @@ using std::string;
 
 
 //Return zero filled whitespace for DD/HH/MM/SS leading zeros 
-string Format::PrettyDate(long data){
+string Format::PrettyDate(const long& data){
 
     //create a string of the data provided
     string tempFig = std::to_string(data);
@@ -21,7 +21,7 @@ return tempFig;
 
 
 //Return DD:HH:MM:SS formatted string
-string Format::ElapsedTime(long seconds) { 
+string Format::ElapsedTime(const long& seconds) { 
 
     long hh, mm, ss, dd;
     //calculate DD:HH:MM:SS from seconds

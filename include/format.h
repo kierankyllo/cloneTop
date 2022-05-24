@@ -4,8 +4,8 @@
 #include <string>
 
 namespace Format {
-std::string PrettyDate(long data);
-std::string ElapsedTime(long times); 
+std::string PrettyDate(const long& data);
+std::string ElapsedTime(const long& times); 
 };                                    
 
 #endif
