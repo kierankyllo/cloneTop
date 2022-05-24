@@ -13,9 +13,8 @@ using std::vector;
 
 string LinuxParser::OperatingSystem() {
 
-  string line;
-  string key;
-  string value;
+  string line, key, value;
+  //Open a well formed filestream and replace unwanted chars
   std::ifstream filestream(kOSPath);
   if (filestream.is_open()) {
     while (std::getline(filestream, line)) {
@@ -23,6 +22,7 @@ string LinuxParser::OperatingSystem() {
       std::replace(line.begin(), line.end(), '=', ' ');
       std::replace(line.begin(), line.end(), '"', ' ');
       std::istringstream linestream(line);
+      //find the key and return the value
       while (linestream >> key >> value) {
         if (key == "PRETTY_NAME") {
           std::replace(value.begin(), value.end(), '_', ' ');
@@ -31,22 +31,27 @@ string LinuxParser::OperatingSystem() {
       }
     }
   }
-  return value;
+
+return value;
 }
 
 
+//Return the kernel version from system files
 string LinuxParser::Kernel() {
 
-  string os, version, kernel;
-  string line;
+  string line, os, version, kernel;
+  //Open a well formed filestream
   std::ifstream stream(kProcDirectory + kVersionFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
     std::istringstream linestream(line);
+    //locate kernel version in file and return it
     linestream >> os >> version >> kernel;
   }
+
 return kernel;
 }
+
 
 //BONUS: implement with std::filesystem
 vector<int> LinuxParser::Pids() {
@@ -70,6 +75,7 @@ vector<int> LinuxParser::Pids() {
 }
 
 
+//Return a float of the memory utilization
 float LinuxParser::MemoryUtilization() { 
 
   vector<double> memVector;
@@ -89,82 +95,79 @@ float LinuxParser::MemoryUtilization() {
   }
   //calculate the memory utilization float and return it
   float memUtil = (memVector[0] - memVector[1])/memVector[0];
+
 return memUtil;
 }
 
 
+//Return the system uptime
 long LinuxParser::UpTime() { 
 
-  string uptime;
-  string line;
+  string line, uptime;
+  //open a well formed filestream
   std::ifstream stream(kProcDirectory + kUptimeFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
     std::istringstream linestream(line);
+    //locate the uptime value and return the casted long value 
     linestream >> uptime;
-    return stol(uptime); 
+    return stoll(uptime); 
   }
+
 return 0;
 }
 
 
-long LinuxParser::Jiffies() { 
-
-vector<long> cpuCurrValues = LinuxParser::CpuUtilization();
-  long currJiff {0};
-  //sum the first 7 values of the vector into total current sum 
-  for (int i = 0 ; i < 10; i++){
-      currJiff += cpuCurrValues[i];
-  }
-return currJiff;  
-}
-
-// TODO: Read and return the number of active jiffies for a PID
-// REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
-
-
+//Return the sum of values of indices 0-7 of the CpuUtilization vector
 long LinuxParser::ActiveJiffies() { 
 
-vector<long> cpuCurrValues = CpuUtilization();
+  //fetch CpuUtilization vector
+  vector<long> cpuCurrValues = CpuUtilization();
   long currActive {0};
   //sum the first 7 values of the vector into total current sum 
-  for (int i = 0 ; i < 8; i++){
-      currActive += cpuCurrValues[i];
+  for (int i = 0 ; i <= 7; i++){
+    currActive += cpuCurrValues[i];
   }
+
 return currActive;  
 }
 
-
+//Return the sum of indices 3 and 4
 long LinuxParser::IdleJiffies() {
 
-vector<long> cpuCurrValues = LinuxParser::CpuUtilization();
-  long currIdle {0};
+  //fetch CpuUtilization vector
+  vector<long> cpuCurrValues = LinuxParser::CpuUtilization();
   //sum selected values into current idle sum 
-  currIdle = cpuCurrValues[3] + cpuCurrValues[4];
+  long currIdle = cpuCurrValues[3] + cpuCurrValues[4];
+
 return currIdle; 
 }
 
 
+//Return a vector of CpuUtilization figures 
 vector<long> LinuxParser::CpuUtilization() {
 
   vector<long> cpuUtil;
   string line, ignore, figures;
+  //open a well formed file stream
   std::ifstream stream(kProcDirectory + kStatFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
     std::istringstream linestream(line);
     linestream >> ignore;
-    for (auto i = 0; i< 10; i++){
+    //construct a vector of indices 0-9 values from the system data
+    for (auto i = 0; i <= 7; i++){
       linestream >> figures;
       cpuUtil.push_back(stoll(figures));
     }
 
   }
+
 return cpuUtil;  
 }
 
 
+//Return an integer value of the total running processes
 int LinuxParser::TotalProcesses() { 
 
   string line, key, value, ignore;
@@ -182,10 +185,12 @@ int LinuxParser::TotalProcesses() {
       }
     }
   }
+
 return 0;
 }
 
 
+//Return an integer of total running processes
 int LinuxParser::RunningProcesses() { 
 
   string line, key, value, ignore;
@@ -203,22 +208,29 @@ int LinuxParser::RunningProcesses() {
       }
     }
   }
+
 return 0;
 }
 
 
+//Returns the formatted command string
 string LinuxParser::Command(int pid) { 
 
   string cmdLineString;
+  //open a well formed file stream
   std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kCmdlineFilename);
   if (stream.is_open()) {
+    //get the first line and return a formatted string of command chars
     std::getline(stream, cmdLineString);
   return "  " + cmdLineString;
   }
+
+//else return default value 
 return "~";
 }
 
 
+//Returns a string of the VmSize in MB
 string LinuxParser::Ram(int pid) { 
 
   string line, key, value, ignore = "";
@@ -239,9 +251,13 @@ string LinuxParser::Ram(int pid) {
     }
   return to_string(vmSize /1024);
   }
+
+//else return default value  
 return "~";
 }
 
+
+//Return the UID of a given process
 string LinuxParser::Uid(int pid) {
   
   string line, key, value, ignore = "";
@@ -262,19 +278,25 @@ string LinuxParser::Uid(int pid) {
     }
   return uidString;
   }
+
+//else return default value
 return "~";
 }
 
 
+//Return a string of the process user of a given process
 string LinuxParser::User(int pid) {
 
   string uid = Uid(pid);
   string line, key, userString, ignore;
+  //open a well formed file stream
   std::ifstream stream(kPasswordPath);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
+      //format the getline
       std::replace(line.begin(), line.end(), ':', ' ');
       std::istringstream iss(line);
+      //locate the userstring for the given key
       while (iss >> userString >> ignore >> key) {
         if (key == uid) {
           return userString;
@@ -282,38 +304,49 @@ string LinuxParser::User(int pid) {
       }
     }
   }
-  return userString;
+
+return userString;
 }
 
 
+//Return the uptime of a given pid
 long LinuxParser::UpTime(int pid) {
-  //get a vector of the first 22 values from /proc/{PID}/stat
+
+  //fetch process utilization vector
   vector<string> procUtilVector = getProcUtilVector(pid);
   //get clockHz 
   double clockHz = sysconf(_SC_CLK_TCK);
   //get long of clockTicks
   long clockTicks = stoll(procUtilVector[21]);
-  //calculate and return seconds of uptime
-  return clockTicks/clockHz;
+
+//calculate and return seconds of uptime
+return clockTicks/clockHz;
 }
 
+
+//Return a vector of the processor utilization figures
 vector<string> LinuxParser::getProcUtilVector(int pid){
 
   vector<string> procValues;
   string line, value;
+  //open a well formed file stream
   std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kStatFilename);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream iss(line);
-      for (int i = 0; i <= 22; i++) {
+      //push the first 0-21 indices into a vector
+      for (int i = 0; i < 22; i++) {
         iss >> value;
         procValues.push_back(value);
       }
     }
   }
+
 return procValues;
 }
 
+
+//Return a float of the processor utilization percentage
 float LinuxParser::procUtilization(int pid) { 
 
   //get a vector of the first 22 values from /proc/{PID}/stat

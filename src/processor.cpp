@@ -7,16 +7,15 @@
 using std::vector;
 using std::string;
 
+
+//Return a float of the processor utilization
 float Processor::Utilization() { 
     
     //fetch the utilization vector
     vector<long> cpuCurrValues = LinuxParser::CpuUtilization();
     
     //init vars
-    double currActive;
-    double currIdle;
-    double deltaTotal;
-    double deltaIdle;
+    double currActive, currIdle, deltaTotal, deltaIdle;
     float currUtil;
 
     //fetch current active

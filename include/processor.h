@@ -4,10 +4,10 @@
 #include <vector>
 
 class Processor {
- public:
-  float Utilization();  
+public:
+    float Utilization();  
 
- private:
+private:
  
     long prevTotal {0};
     long prevIdle {0};

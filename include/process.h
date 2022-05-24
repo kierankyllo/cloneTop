@@ -4,7 +4,7 @@
 #include <string>
 
 class Process {
- public:
+  public:
     Process(int);
     int Pid();                               
     std::string User();                      
@@ -21,6 +21,6 @@ class Process {
     std::string ram_;
     long uptime_;
     float util_;
-};
+    };
 
 #endif
