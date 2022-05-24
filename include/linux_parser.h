@@ -20,6 +20,7 @@ const std::string kPasswordPath{"/etc/passwd"};
 
 //Helpers
 long SafeStol(std::string input);
+int SafeStoi(std::string input);
 
 // System
 float MemoryUtilization();
@@ -33,24 +34,24 @@ std::string Kernel();
 // CPU
 enum CPUStates {
   kUser_ = 0,
-  kNice_,
-  kSystem_,
-  kIdle_,
-  kIOwait_,
-  kIRQ_,
-  kSoftIRQ_,
-  kSteal_,
+  kNice_ = 1,
+  kSystem_ = 2,
+  kIdle_ = 3,
+  kIOwait_ = 4,
+  kIRQ_ = 5,
+  kSoftIRQ_ = 6,
+  kSteal_ = 7,
   kGuest_,
   kGuestNice_
 };
 
-// Process vector data locations
+// Process utilization vector data indices
 enum ProcessCPUStates {
-  kUtime_ = 14,
-  kStime_ = 15,
-  kCutime_ = 16,
-  kCstime_ = 17,
-  kStarttime_ = 22
+  kUtime_ = 13,
+  kStime_ = 14,
+  kCutime_,
+  kCstime_,
+  kStarttime_ = 21
 };
 
 // CPU

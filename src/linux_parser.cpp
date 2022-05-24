@@ -18,7 +18,18 @@ long LinuxParser::SafeStol(string input){
     return std::stol(input);
   } 
   catch (const std::invalid_argument& arg) {
-    return 0;
+  return 0;
+  }
+}
+
+//Exception handler for conversion from string to int
+int LinuxParser::SafeStoi(string input){
+
+  try {
+    return std::stoi(input);
+  } 
+  catch (const std::invalid_argument& arg) {
+  return 0;
   }
 }
 
@@ -78,7 +89,7 @@ vector<int> LinuxParser::Pids() {
       // Is every character of the name a digit?
       string filename(file->d_name);
       if (std::all_of(filename.begin(), filename.end(), isdigit)) {
-        int pid = stoi(filename);
+        int pid = SafeStoi(filename);
         pids.push_back(pid);
       }
     }
@@ -102,9 +113,9 @@ float LinuxParser::MemoryUtilization() {
       std::getline(stream, line);
       //convert the line to a stringstream
       std::istringstream linestream(line);
-      //ignore the first and then push the second symbol on the line to a vector of integers and stoi() to integer
+      //ignore the first and then push the second symbol on the line to a vector of integers and SafeStoi() to integer
       linestream >> ignore >> value;
-      memVector.push_back(stoi(value));
+      memVector.push_back(SafeStoi(value));
     }
   }
   //calculate the memory utilization float and return it
@@ -137,9 +148,9 @@ long LinuxParser::ActiveJiffies() {
 
   //fetch CpuUtilization vector
   vector<long> cpuCurrValues = CpuUtilization();
-  long currActive {0};
+  long currActive = 0;
   //sum the first 7 values of the vector into total current sum 
-  for (int i = 0 ; i <= 7; i++){
+  for (int i = 0 ; i <= kSteal_; i++){
     currActive += cpuCurrValues[i];
   }
 
@@ -152,7 +163,7 @@ long LinuxParser::IdleJiffies() {
   //fetch CpuUtilization vector
   vector<long> cpuCurrValues = LinuxParser::CpuUtilization();
   //sum selected values into current idle sum 
-  long currIdle = cpuCurrValues[3] + cpuCurrValues[4];
+  long currIdle = cpuCurrValues[kIdle_] + cpuCurrValues[kIOwait_];
 
 return currIdle; 
 }
@@ -169,8 +180,8 @@ vector<long> LinuxParser::CpuUtilization() {
     std::getline(stream, line);
     std::istringstream linestream(line);
     linestream >> ignore;
-    //construct a vector of indices 0-9 values from the system data
-    for (auto i = 0; i <= 7; i++){
+    //construct a vector of indices 0-7 values from the system data
+    for (auto i = 0; i <= kSteal_; i++){
       linestream >> figures;
       cpuUtil.push_back(SafeStol(figures));
     }
@@ -195,7 +206,7 @@ int LinuxParser::TotalProcesses() {
       //if the linestream contains the search term return the second token on that line as an integer
       if (line.find(key, 0) != string::npos){
         iss >> ignore >> value;
-        return std::stoi(value);
+        return SafeStoi(value);
       }
     }
   }
@@ -218,7 +229,7 @@ int LinuxParser::RunningProcesses() {
       //if the linestream contains the search term return the second token on that line as an integer
       if (line.find(key, 0) != string::npos){
         iss >> ignore >> value;
-        return std::stoi(value);
+        return SafeStoi(value);
       }
     }
   }
@@ -331,7 +342,7 @@ long LinuxParser::UpTime(int pid) {
   //get clockHz 
   double clockHz = sysconf(_SC_CLK_TCK);
   //get long of clockTicks
-  long clockTicks = SafeStol(procUtilVector[kStarttime_-1]);
+  long clockTicks = SafeStol(procUtilVector[kStarttime_]);
 
 //calculate and return seconds of uptime
 return clockTicks/clockHz;
@@ -349,7 +360,7 @@ vector<string> LinuxParser::getProcUtilVector(int pid){
     while (std::getline(stream, line)) {
       std::istringstream iss(line);
       //push the first 0-21 indices into a vector
-      for (int i = 0; i < kStarttime_; i++) {
+      for (int i = 0; i <= kStarttime_; i++) {
         iss >> value;
         procValues.push_back(value);
       }
@@ -366,10 +377,10 @@ float LinuxParser::procUtilization(int pid) {
   //get a vector of the first 22 values from /proc/{PID}/stat
   vector<string> procUtilVector = getProcUtilVector(pid);
   //totalTime = v[13]+v[14]
-  double totalTime = SafeStol(procUtilVector[kUtime_-1]) + SafeStol(procUtilVector[kStime_-1]); 
+  double totalTime = SafeStol(procUtilVector[kUtime_]) + SafeStol(procUtilVector[kStime_]); 
   double clockHz = sysconf(_SC_CLK_TCK);
   //seconds = UpTime(pid) - (v[21] / ClockHz)
-  double seconds = UpTime() - (SafeStol(procUtilVector[kStarttime_-1])/clockHz);
+  double seconds = UpTime() - (SafeStol(procUtilVector[kStarttime_])/clockHz);
   //usage = 100* (total_time / ClockHz)/seconds
   float usage = (totalTime / clockHz)/seconds; 
 
