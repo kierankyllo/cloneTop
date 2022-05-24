@@ -12,7 +12,7 @@ using std::vector;
 
 
 //Exception handling for conversion from string to long
-long LinuxParser::SafeStol(string input){
+long LinuxParser::SafeStol(const string& input){
 
   try {
     return std::stol(input);
@@ -23,7 +23,7 @@ long LinuxParser::SafeStol(string input){
 }
 
 //Exception handler for conversion from string to int
-int LinuxParser::SafeStoi(string input){
+int LinuxParser::SafeStoi(const string& input){
 
   try {
     return std::stoi(input);
@@ -239,8 +239,8 @@ return 0;
 
 
 //Returns the formatted command string
-string LinuxParser::Command(int pid) { 
-
+string LinuxParser::Command(const int& pid) { 
+ 
   string cmdLineString;
   //open a well formed file stream
   std::ifstream stream(kProcDirectory + "/" + std::to_string(pid) + kCmdlineFilename);
@@ -256,7 +256,7 @@ return "~";
 
 
 //Returns a string of the VmSize in MB
-string LinuxParser::Ram(int pid) { 
+string LinuxParser::Ram(const int& pid) { 
 
   string line, key, value, ignore = "";
   //define the search term
@@ -283,7 +283,7 @@ return "~";
 
 
 //Return the UID of a given process
-string LinuxParser::Uid(int pid) {
+string LinuxParser::Uid(const int& pid) {
   
   string line, key, value, ignore = "";
   //define the search term
@@ -310,7 +310,7 @@ return "~";
 
 
 //Return a string of the process user of a given process
-string LinuxParser::User(int pid) {
+string LinuxParser::User(const int& pid) {
 
   string uid = Uid(pid);
   string line, key, userString, ignore;
@@ -335,7 +335,7 @@ return userString;
 
 
 //Return the uptime of a given pid
-long LinuxParser::UpTime(int pid) {
+long LinuxParser::UpTime(const int& pid) {
 
   //fetch process utilization vector
   vector<string> procUtilVector = getProcUtilVector(pid);
@@ -350,7 +350,7 @@ return clockTicks/clockHz;
 
 
 //Return a vector of the processor utilization figures
-vector<string> LinuxParser::getProcUtilVector(int pid){
+vector<string> LinuxParser::getProcUtilVector(const int &pid){
 
   vector<string> procValues;
   string line, value;
@@ -372,7 +372,7 @@ return procValues;
 
 
 //Return a float of the processor utilization percentage
-float LinuxParser::procUtilization(int pid) { 
+float LinuxParser::procUtilization(const int& pid) { 
 
   //get a vector of the first 22 values from /proc/{PID}/stat
   vector<string> procUtilVector = getProcUtilVector(pid);

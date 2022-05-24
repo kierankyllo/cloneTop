@@ -19,8 +19,8 @@ const std::string kOSPath{"/etc/os-release"};
 const std::string kPasswordPath{"/etc/passwd"};
 
 //Helpers
-long SafeStol(std::string input);
-int SafeStoi(std::string input);
+long SafeStol(const std::string& input);
+int SafeStoi(const std::string& input);
 
 // System
 float MemoryUtilization();
@@ -57,17 +57,17 @@ enum ProcessCPUStates {
 // CPU
 std::vector<long> CpuUtilization();
 long ActiveJiffies();
-long ActiveJiffies(int pid);
+long ActiveJiffies(const int& pid);
 long IdleJiffies();
 
 // Processes
-std::string Command(int pid);
-std::string Ram(int pid);
-std::string Uid(int pid);
-std::string User(int pid);
-long int UpTime(int pid);
-std::vector<std::string> getProcUtilVector(int pid);
-float procUtilization(int pid);
+std::string Command(const int& pid);
+std::string Ram(const int& pid);
+std::string Uid(const int& pid);
+std::string User(const int& pid);
+long int UpTime(const int& pid);
+std::vector<std::string> getProcUtilVector(const int& pid);
+float procUtilization(const int& pid);
 };  // namespace LinuxParser
 
 #endif
