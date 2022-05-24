@@ -1,6 +1,6 @@
 # cloneTop
 
-This project was completed as part of the Object Oriented Programming Course of the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213). 
+cloneTop is a htop-like system monitor application for Linux. This project was completed as part of the Object Oriented Programming Course of the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213). 
 
 ![System Monitor](images/monitor.png)
 
