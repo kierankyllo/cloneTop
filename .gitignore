@@ -6,3 +6,4 @@ build/*
 *.json
 .github/**
 testParse.cpp
+test
