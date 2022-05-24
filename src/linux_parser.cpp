@@ -11,6 +11,19 @@ using std::to_string;
 using std::vector;
 
 
+//Exception handling for conversion from string to long
+long LinuxParser::SafeStol(string input){
+
+  try {
+    return std::stol(input);
+  } 
+  catch (const std::invalid_argument& arg) {
+    return 0;
+  }
+}
+
+
+//Return the OS pretty name string
 string LinuxParser::OperatingSystem() {
 
   string line, key, value;
@@ -53,7 +66,7 @@ return kernel;
 }
 
 
-//BONUS: implement with std::filesystem
+//Return a vector of process ids
 vector<int> LinuxParser::Pids() {
 
   vector<int> pids;
@@ -71,7 +84,8 @@ vector<int> LinuxParser::Pids() {
     }
   }
   closedir(directory);
-  return pids;
+
+return pids;
 }
 
 
@@ -111,7 +125,7 @@ long LinuxParser::UpTime() {
     std::istringstream linestream(line);
     //locate the uptime value and return the casted long value 
     linestream >> uptime;
-    return stoll(uptime); 
+    return SafeStol(uptime); 
   }
 
 return 0;
@@ -158,7 +172,7 @@ vector<long> LinuxParser::CpuUtilization() {
     //construct a vector of indices 0-9 values from the system data
     for (auto i = 0; i <= 7; i++){
       linestream >> figures;
-      cpuUtil.push_back(stoll(figures));
+      cpuUtil.push_back(SafeStol(figures));
     }
 
   }
@@ -245,7 +259,7 @@ string LinuxParser::Ram(int pid) {
       //if the linestream contains the search term return the second token on that line
       if (line.find(key, 0) != string::npos){
         iss >> ignore >> value;
-        vmSize = stol(value);
+        vmSize = SafeStol(value);
         break;
       }
     }
@@ -317,7 +331,7 @@ long LinuxParser::UpTime(int pid) {
   //get clockHz 
   double clockHz = sysconf(_SC_CLK_TCK);
   //get long of clockTicks
-  long clockTicks = stoll(procUtilVector[21]);
+  long clockTicks = SafeStol(procUtilVector[21]);
 
 //calculate and return seconds of uptime
 return clockTicks/clockHz;
@@ -352,10 +366,10 @@ float LinuxParser::procUtilization(int pid) {
   //get a vector of the first 22 values from /proc/{PID}/stat
   vector<string> procUtilVector = getProcUtilVector(pid);
   //totalTime = v[13]+v[14]
-  double totalTime = stoll(procUtilVector[13]) + stoll(procUtilVector[14]); 
+  double totalTime = SafeStol(procUtilVector[13]) + SafeStol(procUtilVector[14]); 
   double clockHz = sysconf(_SC_CLK_TCK);
   //seconds = UpTime(pid) - (v[21] / ClockHz)
-  double seconds = UpTime() - (stoll(procUtilVector[21])/clockHz);
+  double seconds = UpTime() - (SafeStol(procUtilVector[21])/clockHz);
   //usage = 100* (total_time / ClockHz)/seconds
   float usage = (totalTime / clockHz)/seconds; 
 
