@@ -331,7 +331,7 @@ long LinuxParser::UpTime(int pid) {
   //get clockHz 
   double clockHz = sysconf(_SC_CLK_TCK);
   //get long of clockTicks
-  long clockTicks = SafeStol(procUtilVector[21]);
+  long clockTicks = SafeStol(procUtilVector[kStarttime_-1]);
 
 //calculate and return seconds of uptime
 return clockTicks/clockHz;
@@ -349,7 +349,7 @@ vector<string> LinuxParser::getProcUtilVector(int pid){
     while (std::getline(stream, line)) {
       std::istringstream iss(line);
       //push the first 0-21 indices into a vector
-      for (int i = 0; i < 22; i++) {
+      for (int i = 0; i < kStarttime_; i++) {
         iss >> value;
         procValues.push_back(value);
       }
@@ -366,10 +366,10 @@ float LinuxParser::procUtilization(int pid) {
   //get a vector of the first 22 values from /proc/{PID}/stat
   vector<string> procUtilVector = getProcUtilVector(pid);
   //totalTime = v[13]+v[14]
-  double totalTime = SafeStol(procUtilVector[13]) + SafeStol(procUtilVector[14]); 
+  double totalTime = SafeStol(procUtilVector[kUtime_-1]) + SafeStol(procUtilVector[kStime_-1]); 
   double clockHz = sysconf(_SC_CLK_TCK);
   //seconds = UpTime(pid) - (v[21] / ClockHz)
-  double seconds = UpTime() - (SafeStol(procUtilVector[21])/clockHz);
+  double seconds = UpTime() - (SafeStol(procUtilVector[kStarttime_-1])/clockHz);
   //usage = 100* (total_time / ClockHz)/seconds
   float usage = (totalTime / clockHz)/seconds; 
 
